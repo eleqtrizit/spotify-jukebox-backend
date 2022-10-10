@@ -1,15 +1,25 @@
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-from api.auth import auth
 from api.auth import callback as cb
+from api.auth import get_auth_url
 from api.get_album_songs import GetAlbumSongs
 from api.get_albums import GetAlbums
 from api.get_artist_songs import GetArtistSongs
 from api.search import Search
 
+# from fastapi.responses import HTMLResponse
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex="https?://.*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+
+)
 
 
 @app.get("/")
@@ -25,9 +35,9 @@ def authorized(party_id: str):
     }
 
 
-@app.get("/authorize", response_class=HTMLResponse)
-def authorize(request: Request):
-    return auth(request)
+@app.get("/auth_url")
+def auth_url(request: Request):
+    return get_auth_url(request)
 
 
 @app.get("/callback")
