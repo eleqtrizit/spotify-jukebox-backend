@@ -1,5 +1,9 @@
+
+
+from time import sleep
+
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth import callback as cb
@@ -7,6 +11,7 @@ from api.auth import get_auth_url
 from api.get_album_songs import GetAlbumSongs
 from api.get_albums import GetAlbums
 from api.get_artist_songs import GetArtistSongs
+from api.get_playlist_tracks import GetPlaylistTracks
 from api.search import Search
 
 # from fastapi.responses import HTMLResponse
@@ -43,6 +48,39 @@ def auth_url(request: Request):
 @app.get("/callback")
 def callback(request: Request):
     return cb(request)
+
+
+@app.get("/playlist_tracks/{party_id}")
+def playlist_tracks(party_id: str):
+    return GetPlaylistTracks(party_id).get_playlist_tracks()
+
+
+@app.websocket('/ws')
+async def websocket_endpoint2(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        await websocket.send_text('Hello')
+        await sleep(1)
+
+
+@app.websocket("/ws_playlist_tracks/{party_id}")
+async def websocket_endpoint(websocket: WebSocket, party_id: str):
+    print(f"Connection for {party_id} ================================")
+    last_playlist_tracks = None
+    await websocket.accept()
+    rec_text = await websocket.receive_text()
+    print(rec_text)
+    if rec_text == "start":
+        while True:
+            playlist_tracks = GetPlaylistTracks(party_id).get_playlist_tracks()
+            await websocket.send_json(playlist_tracks)
+
+            if playlist_tracks != last_playlist_tracks:
+                print("Sending data")
+                await websocket.send_json(playlist_tracks)
+                last_playlist_tracks = playlist_tracks
+            sleep(2)
+    print("Disconnected.")
 
 
 @app.get("/search/artist/{name}/{party_id}")

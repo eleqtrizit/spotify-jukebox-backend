@@ -1,5 +1,4 @@
 from api.add_track import AddTrack
-from common.playlist import get_playlist_id
 
 PARTY_MIX = [
     "spotify:track:6rrUcrhWlW3CqGYT0zxYlz",
@@ -14,6 +13,5 @@ PARTY_MIX = [
 
 
 def party_mix(party_id: str) -> None:
-    playlist_id = get_playlist_id(party_id)
     for track in PARTY_MIX:
-        AddTrack(party_id).add_song(playlist_id, track)
+        AddTrack(party_id).add_song(track)

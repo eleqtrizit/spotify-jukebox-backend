@@ -1,7 +1,7 @@
-import json
 from typing import Any, Dict
 
 from api.base import Base
+from common.cache import write_cache
 
 
 class CreatePlaylist(Base):
@@ -13,5 +13,5 @@ class CreatePlaylist(Base):
             collaborative = False,
             description   = "Jukebox"
         )
-        with open(f"/tmp/partyatmyhouse/{self.party_id}_playlist.json", "w") as f:
-            f.write(json.dumps(playlist))
+
+        write_cache(self.playlist_file, playlist)

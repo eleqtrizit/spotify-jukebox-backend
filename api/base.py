@@ -1,16 +1,51 @@
+
 from typing import Any, Dict, List, Union
 
 import spotipy
 
+from common.cache import load_cache, write_cache
 from common.sp_auth import sp_auth
 
 
 class Base:
     def __init__(self, party_id: str) -> None:
-        self.party_id = party_id
-        sp_oauth      = sp_auth(party_id)
-        token         = sp_oauth.get_access_token()
+        self.party_id            = party_id
+        sp_oauth                 = sp_auth(party_id)
+        token                    = sp_oauth.get_access_token()
+        self.playlist_file       = f"{party_id}_playlist.json"
+        self.playlist_cache_file = f"{party_id}_playlist_cache.json"
         spotipy.Spotify(auth=token["access_token"])
+
+    @property
+    def playlist_tracks(self):
+        tracks = load_cache(self.playlist_cache_file)
+        if not tracks:
+            tracks = self._get_playlist_tracks()
+            write_cache(self.playlist_cache_file, tracks)
+        else:
+            print('Cached')
+        return tracks
+
+    def _get_playlist_tracks(self):
+        results = self.spotify.user_playlist_tracks(
+            user        = self.spotify.current_user()['id'],
+            playlist_id = self.playlist_id,
+            limit       = 100
+        )
+        tracks  = results['items']
+        while results['next']:
+            results = self.spotify.next(results)
+            tracks.extend(results['items'])
+        # unwrap tracks
+        return self.extract_tracks([track['track'] for track in tracks])
+
+    @property
+    def playlist_info(self) -> Union[Dict[str, Any], None]:
+        return load_cache(self.playlist_file)
+
+    @property
+    def playlist_id(self) -> Union[str, None]:
+        return self.playlist_info['id'] if self.playlist_info else None
 
     @property
     def spotify(self):
