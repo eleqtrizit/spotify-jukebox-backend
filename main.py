@@ -1,5 +1,3 @@
-
-
 from time import sleep
 
 import uvicorn
@@ -65,53 +63,54 @@ async def websocket_endpoint2(websocket: WebSocket):
 
 @app.websocket("/ws_playlist_tracks/{party_id}")
 async def websocket_endpoint(websocket: WebSocket, party_id: str):
-    print(f"Connection for {party_id} ================================")
-    last_playlist_tracks = None
     await websocket.accept()
-    rec_text = await websocket.receive_text()
-    print(rec_text)
-    if rec_text == "start":
-        while True:
-            playlist_tracks = GetPlaylistTracks(party_id).get_playlist_tracks()
-            await websocket.send_json(playlist_tracks)
+    print(f"Connection for {party_id} ================================")
 
-            if playlist_tracks != last_playlist_tracks:
-                print("Sending data")
-                await websocket.send_json(playlist_tracks)
-                last_playlist_tracks = playlist_tracks
-            sleep(2)
+    last_playlist_tracks = None
+    await websocket.receive_text()
+    while True:
+        playlist_tracks = GetPlaylistTracks(party_id).get_playlist_tracks()
+        await websocket.send_json(playlist_tracks)
+        if playlist_tracks == last_playlist_tracks:
+            await websocket.send_json({"no_change": True})
+        else:
+            print("Sending data")
+            await websocket.send_json(playlist_tracks)
+            last_playlist_tracks = playlist_tracks
+        sleep(1)
+
     print("Disconnected.")
 
 
-@app.get("/search/artist/{name}/{party_id}")
+@ app.get("/search/artist/{name}/{party_id}")
 def search_artist_name(name: str, party_id: str):
     # http://0.0.0.0:8000/search/artist/Ice%20Cube/c6b9d426
     return Search(party_id).search_for_artist(name)
 
 
-@app.get("/search/track/{name}/{party_id}")
+@ app.get("/search/track/{name}/{party_id}")
 def search_track_name(name: str, party_id: str):
     # http://0.0.0.0:8000/search/track/american%20idiot/c6b9d426
     return Search(party_id).search_for_track(name)
 
 
-@app.get("/albums/{uri}/{party_id}")
+@ app.get("/albums/{uri}/{party_id}")
 def albums_uri(uri: str, party_id: str):
     # http://0.0.0.0:8000/albums/spotify:artist:3Mcii5XWf6E0lrY3Uky4cA/c6b9d426
     return GetAlbums(party_id).get_albums(uri)
 
 
-@app.get("/album/songs/{uri}/{party_id}")
+@ app.get("/album/songs/{uri}/{party_id}")
 def album_songs_uri(uri: str, party_id: str):
     # http://0.0.0.0:8000/album/songs/spotify:album:0Uc3ButAVMni0Dnk5FFxN2/c6b9d426
     return GetAlbumSongs(party_id).get_album_songs(uri)
 
 
-@app.get("/artist/songs/{uri}/{party_id}")
+@ app.get("/artist/songs/{uri}/{party_id}")
 def artist_songs_uri(uri: str, party_id: str):
     # http://0.0.0.0:8000/artist/songs/spotify:artist:3Mcii5XWf6E0lrY3Uky4cA/c6b9d426
     return GetArtistSongs(party_id).get_artist_songs(uri)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host = "0.0.0.0", port = 8000)
