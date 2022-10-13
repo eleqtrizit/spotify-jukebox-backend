@@ -1,5 +1,3 @@
-from time import sleep
-
 import uvicorn
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,15 +51,15 @@ def callback(request: Request):
 
 @app.get("/playlist_tracks/{party_id}")
 def playlist_tracks(party_id: str):
-    return error_if_invalid(party_id) or GetPlaylistTracks(party_id).get_playlist_tracks()
+    return error_if_invalid(party_id) or GetPlaylistTracks(party_id).get_playlist_tracks(cache=False)
 
 
-@app.websocket('/ws')
-async def websocket_endpoint2(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        await websocket.send_text('Hello')
-        await sleep(1)
+# @app.websocket('/ws')
+# async def websocket_endpoint2(websocket: WebSocket):
+#     await websocket.accept()
+#     while True:
+#         await websocket.send_text('Hello')
+#         await sleep(1)
 
 
 @app.websocket("/ws_playlist_tracks/{party_id}")

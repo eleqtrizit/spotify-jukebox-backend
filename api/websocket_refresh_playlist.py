@@ -8,7 +8,8 @@ async def websocket_refresh_playlist(websocket, party_id):
     print(f"Connection for {party_id} ================================")
 
     last_playlist_tracks = None
-    await websocket.receive_text()
+    text = await websocket.receive_text()
+    print(text)
 
     counter = 0
     pl = GetPlaylistTracks(party_id)
