@@ -1,20 +1,25 @@
 
+from os.path import exists
 from typing import Any, Dict, List, Union
 
 import spotipy
 
-from common.cache import load_cache, write_cache
+from common.cache import STORAGE, load_cache, write_cache
 from common.sp_auth import sp_auth
 
 
 class Base:
     def __init__(self, party_id: str) -> None:
-        self.party_id            = party_id
-        sp_oauth                 = sp_auth(party_id)
-        token                    = sp_oauth.get_access_token()
+        self.party_id           = party_id
         self.playlist_file       = f"{party_id}_playlist.json"
         self.playlist_cache_file = f"{party_id}_playlist_cache.json"
-        spotipy.Spotify(auth=token["access_token"])
+        if not self.error_if_invalid():
+            sp_oauth                 = sp_auth(party_id)
+            token  = sp_oauth.get_access_token()
+            spotipy.Spotify(auth=token["access_token"])
+
+    def error_if_invalid(self) -> Union[None, Dict[str, any]]:
+        return None if exists(f"{STORAGE}/{self.playlist_file}") else {"error": "Invalid party ID"}
 
     @property
     def playlist_tracks(self):
@@ -22,8 +27,17 @@ class Base:
         if not tracks:
             tracks = self._get_playlist_tracks()
             write_cache(self.playlist_cache_file, tracks)
+            print('MISS')
         else:
-            print('Cached')
+            print('HIT')
+        return tracks
+
+    @property
+    def playlist_tracks_no_cache(self):
+        # TODO: remove this method, only used for demo
+        print('REFRESH')
+        tracks = self._get_playlist_tracks()
+        write_cache(self.playlist_cache_file, tracks)
         return tracks
 
     def _get_playlist_tracks(self):
@@ -72,11 +86,14 @@ class Base:
                 id      = track['id'],
                 uri     = track['uri'],
                 artists = self._extract_track_artists(track),
-                album   = self._extract_album(track.get('album')),
+                album   = self.extract_album(track.get('album')),
             ) for track in tracks
         ]
 
-    def _extract_album(self, album: Union[Dict[str, Any], None]) -> Union[Dict[str, str], None]:
+    def extract_albums(self, album: List[Union[Dict[str, Any], None]]) -> Union[Dict[str, str], None]:
+        return [self.extract_album(a) for a in album]
+
+    def extract_album(self, album: Union[Dict[str, Any], None]) -> Union[Dict[str, str], None]:
         if album:
             return dict(
                 name  = album['name'],

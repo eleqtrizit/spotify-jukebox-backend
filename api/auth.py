@@ -19,7 +19,7 @@ def get_auth_url(request: Request) -> str:
 def callback(request: Request) -> Dict[str, str]:
     code       = request.query_params.get("code")
     short_code = code[::4]
-    code_file  = f"/tmp/partyatmyhouse/{short_code}.json"
+    code_file   = f"/tmp/partyatmyhouse/{short_code}.json"
 
     party_id = None
     if exists(code_file):
