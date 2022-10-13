@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.add_track import AddTrack
 from api.auth import callback as cb
 from api.auth import get_auth_url
 from api.base import Base
@@ -72,6 +73,11 @@ async def ws_playlist_tracks(websocket: WebSocket, party_id: str):
 @app.get("/search/{query}/{party_id}")
 def search(query: str, party_id: str):
     return error_if_invalid(party_id) or Search(party_id).search(query)
+
+
+@app.get("/add/{track_id}/{party_id}")
+def add(track_id: str, party_id: str):
+    return error_if_invalid(party_id) or AddTrack(party_id).add_song(track_id)
 
 
 @app.get("/albums/{uri}/{party_id}")
