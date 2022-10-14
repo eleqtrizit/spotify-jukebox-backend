@@ -1,9 +1,11 @@
 from typing import Any, Dict
 
 from api.base import Base
+from common.cache import cacher
 
 
 class Search(Base):
+    @cacher
     def search(self, name: str) -> Dict[str, Any]:
         if not name:
             return dict(

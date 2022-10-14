@@ -6,14 +6,12 @@ from api.add_track import AddTrack
 from api.auth import callback as cb
 from api.auth import get_auth_url
 from api.base import Base
-from api.get_album_songs import GetAlbumSongs
+from api.get_album_tracks import GetAlbumTracks
 from api.get_albums import GetAlbums
-from api.get_artist_songs import GetArtistSongs
+from api.get_artist_tracks import GetArtistTracks
 from api.get_playlist_tracks import GetPlaylistTracks
 from api.search import Search
 from api.websocket_refresh_playlist import websocket_refresh_playlist
-
-# from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 app.add_middleware(
@@ -24,6 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    pass
 
 
 @app.get("/")
@@ -49,11 +52,6 @@ def callback(request: Request):
     return cb(request)
 
 
-@app.get("/playlist_tracks/{party_id}")
-def playlist_tracks(party_id: str):
-    return error_if_invalid(party_id) or GetPlaylistTracks(party_id).get_playlist_tracks(cache=False)
-
-
 # @app.websocket('/ws')
 # async def websocket_endpoint2(websocket: WebSocket):
 #     await websocket.accept()
@@ -66,6 +64,11 @@ def playlist_tracks(party_id: str):
 async def ws_playlist_tracks(websocket: WebSocket, party_id: str):
     if not error_if_invalid(party_id):
         await websocket_refresh_playlist(websocket, party_id)
+
+
+@app.get("/playlist_tracks/{party_id}")
+def playlist_tracks(party_id: str):
+    return error_if_invalid(party_id) or GetPlaylistTracks(party_id).get_playlist_tracks(cache=False)
 
 
 @app.get("/search/{query}/{party_id}")
@@ -84,16 +87,16 @@ def albums_uri(uri: str, party_id: str):
     return error_if_invalid(party_id) or GetAlbums(party_id).get_albums(uri)
 
 
-@app.get("/album/songs/{uri}/{party_id}")
-def album_songs_uri(uri: str, party_id: str):
-    # http://0.0.0.0:8000/album/songs/spotify:album:0Uc3ButAVMni0Dnk5FFxN2/c6b9d426
-    return error_if_invalid(party_id) or GetAlbumSongs(party_id).get_album_songs(uri)
+@app.get("/album/tracks/{uri}/{party_id}")
+def album_tracks_uri(uri: str, party_id: str):
+    # http://0.0.0.0:8000/album/tracks/spotify:album:0Uc3ButAVMni0Dnk5FFxN2/c6b9d426
+    return error_if_invalid(party_id) or GetAlbumTracks(party_id).get_album_tracks(uri)
 
 
-@app.get("/artist/songs/{uri}/{party_id}")
-def artist_songs_uri(uri: str, party_id: str):
-    # http://0.0.0.0:8000/artist/songs/spotify:artist:3Mcii5XWf6E0lrY3Uky4cA/c6b9d426
-    return error_if_invalid(party_id) or GetArtistSongs(party_id).get_artist_songs(uri)
+@app.get("/artist/tracks/{uri}/{party_id}")
+def artist_tracks_uri(uri: str, party_id: str):
+    # http://0.0.0.0:8000/artist/tracks/spotify:artist:3Mcii5XWf6E0lrY3Uky4cA/c6b9d426
+    return error_if_invalid(party_id) or GetArtistTracks(party_id).get_artist_tracks(uri)
 
 
 def error_if_invalid(party_id):

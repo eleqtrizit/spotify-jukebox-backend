@@ -1,10 +1,12 @@
 from typing import Any, Dict, List
 
 from api.base import Base
+from common.cache import cacher
 
 
-class GetAlbumSongs(Base):
-    def get_album_songs(self, uri: str) -> List[Dict[str, Any]]:
+class GetAlbumTracks(Base):
+    @cacher
+    def get_album_tracks(self, uri: str) -> List[Dict[str, Any]]:
         results = self.spotify.album_tracks(uri)
         tracks  = results['items']
         while results['next']:

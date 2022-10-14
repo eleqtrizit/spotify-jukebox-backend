@@ -1,9 +1,11 @@
 from collections import OrderedDict
 
 from api.base import Base
+from common.cache import cacher
 
 
 class GetAlbums(Base):
+    @cacher
     def get_albums(self, uri: str) -> OrderedDict:
         results = self.spotify.artist_albums(uri, album_type='album')
         albums  = results['items']
