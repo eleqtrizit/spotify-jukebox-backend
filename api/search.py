@@ -7,6 +7,8 @@ from common.cache import cacher
 class Search(Base):
     @cacher
     def search(self, name: str) -> Dict[str, Any]:
+        name = '' if name == '+' else name.strip()
+
         if not name:
             return dict(
                 tracks   = [],

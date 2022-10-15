@@ -19,7 +19,7 @@ class Base:
             spotipy.Spotify(auth=token["access_token"])
 
     def error_if_invalid(self) -> Union[None, Dict[str, any]]:
-        return None if exists(f"{STORAGE}/{self.playlist_file}") else {"error": "Invalid party ID"}
+        return None if exists(f"{STORAGE}/{self.playlist_file}") else {"valid": False}
 
     @property
     def playlist_tracks(self):

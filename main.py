@@ -99,6 +99,12 @@ def artist_tracks_uri(uri: str, party_id: str):
     return error_if_invalid(party_id) or GetArtistTracks(party_id).get_artist_tracks(uri)
 
 
+@app.get("/check/{party_id}")
+def check_party_id(party_id: str):
+    # http://0.0.0.0:8000/check/c6b9d426
+    return error_if_invalid(party_id) or {"valid": True}
+
+
 def error_if_invalid(party_id):
     return Base(party_id).error_if_invalid()
 
