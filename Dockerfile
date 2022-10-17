@@ -3,10 +3,10 @@ FROM python:3.10-alpine
 
 # set working directory within container
 WORKDIR /app
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 COPY . .
 RUN mkdir -p /tmp/partyatmyhouse
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
 
 CMD ["sh", "start_production.sh"]
 EXPOSE 8000/tcp
