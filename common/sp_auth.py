@@ -3,7 +3,7 @@ from typing import Optional
 
 from spotipy.oauth2 import SpotifyOAuth
 
-REDIRECT_URI = os.environ.get("CALLBACK", "http://localhost:3000/callback")
+REDIRECT_URI = os.environ.get("CALLBACK", "http://localhost:3000/callback_after")
 
 
 def sp_auth(party_id: Optional[str] = None) -> SpotifyOAuth:
