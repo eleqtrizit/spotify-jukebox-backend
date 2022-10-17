@@ -3,6 +3,8 @@ from typing import Optional
 
 from spotipy.oauth2 import SpotifyOAuth
 
+CALLBACK = os.environ.get("CALLBACK", "http://localhost:3000/callback")
+
 
 def sp_auth(party_id: Optional[str] = None) -> SpotifyOAuth:
     params = dict(
