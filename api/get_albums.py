@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import Dict
 
 from api.base import Base
 from common.cache import cacher
@@ -13,6 +14,9 @@ class GetAlbums(Base):
             results = self.spotify.next(results)
             albums.extend(results['items'])
 
+        return self.remove_duplicate_albums(albums)
+
+    def remove_duplicate_albums(self, albums: Dict[str, any]):
         album_list = OrderedDict()
         for album in albums:
             key = album['name'].lower()

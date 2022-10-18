@@ -9,6 +9,7 @@ class GetAlbumTracks(Base):
     def get_album_tracks(self, uri: str) -> List[Dict[str, Any]]:
         results = self.spotify.album_tracks(uri)
         tracks  = results['items']
+
         while results['next']:
             results = self.spotify.next(results)
             tracks.extend(results['items'])

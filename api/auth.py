@@ -31,13 +31,13 @@ def callback(request: Request) -> Dict[str, str]:
 
 # TODO Rename this here and in `callback`
 def create_party(code_file, code):
-    result = str(uuid.uuid4()).split("-")[0]
+    party_id = str(uuid.uuid4()).split("-")[0]
     with open(code_file, "w") as f:
-        f.write(result)
+        f.write(party_id)
 
-    sp_oauth = sp_auth(result)
+    sp_oauth = sp_auth(party_id)
     sp_oauth.get_access_token(code)
-    CreatePlaylist(result).create_playlist(f"Jukebox_{result}")
-    party_mix(result)
+    CreatePlaylist(party_id).create_playlist(f"Jukebox_{party_id}")
+    party_mix(party_id)
 
-    return result
+    return party_id

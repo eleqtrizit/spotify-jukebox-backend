@@ -13,9 +13,10 @@ class Base:
         self.party_id           = party_id
         self.playlist_file       = f"{party_id}_playlist.json"
         self.playlist_cache_file = f"{party_id}_playlist_cache.json"
+
         if not self.error_if_invalid():
-            sp_oauth                 = sp_auth(party_id)
-            token  = sp_oauth.get_access_token()
+            sp_oauth = sp_auth(party_id)
+            token    = sp_oauth.get_access_token()
             spotipy.Spotify(auth=token["access_token"])
 
     def error_if_invalid(self) -> Union[None, Dict[str, any]]:
@@ -25,17 +26,14 @@ class Base:
     def playlist_tracks(self):
         tracks = load_cache(self.playlist_cache_file)
         if not tracks:
-            tracks = self._get_playlist_tracks()
-            write_cache(self.playlist_cache_file, tracks)
-            print('MISS')
-        else:
-            print('HIT')
+            write_cache(
+                fiile = self.playlist_cache_file,
+                data  = self._get_playlist_tracks()
+            )
         return tracks
 
     @property
     def playlist_tracks_no_cache(self):
-        # TODO: remove this method, only used for demo
-        print('REFRESH')
         tracks = self._get_playlist_tracks()
         write_cache(self.playlist_cache_file, tracks)
         return tracks
