@@ -14,8 +14,7 @@ async def websocket_refresh_playlist(websocket, party_id):
     counter = 0
     pl = GetPlaylistTracks(party_id)
     while True:
-        cache = counter % 5 != 0
-        playlist_tracks = pl.get_playlist_tracks(cache=cache)
+        playlist_tracks = pl.get_playlist_tracks(cache=False)
         await websocket.send_json(playlist_tracks)
 
         if playlist_tracks == last_playlist_tracks:
